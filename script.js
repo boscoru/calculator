@@ -81,9 +81,11 @@ function modeZero (input) {
             break;
         case "bs":
         case "Backspace":
-            let bs = num1.pop();
-            screen.textContent = screen.textContent.slice(0,-1);
-            if (bs !== '-' && bs !== '.') numDigits1--;
+            if (num1.length !== 0){
+                let bs = num1.pop();
+                screen.textContent = screen.textContent.slice(0,-1);
+                if (bs !== '-' && bs !== '.') numDigits1--;
+            }
             break;
     }
 }
@@ -156,9 +158,11 @@ function modeOne (input) {
             break;
         case "bs":
         case "Backspace":
-            let bs = num2.pop();
-            screen.textContent = screen.textContent.slice(0,-1);
-            if (bs !== '-' && bs !== '.') numDigits2--;
+            if (num2.length !== 0){
+                let bs = num2.pop();
+                screen.textContent = screen.textContent.slice(0,-1);
+                if (bs !== '-' && bs !== '.') numDigits2--;
+            }
             break;
     }
 }
@@ -212,6 +216,9 @@ function input (e) {
         case 2:
             modeTwo(e.target.id);
             break;
+        case 3:
+            if (e.target.id === 'clr') reset();
+            break;
     }
 }
 
@@ -225,6 +232,9 @@ function keyInput (e) {
             break;
         case 2:
             modeTwo(e.key);
+            break;
+        case 3:
+            if (e.key === 'Delete') reset();
             break;
     }
 }
@@ -262,9 +272,7 @@ function equal() {
     } else {
         let arrAns = num2Arr(numAns);
         screen.textContent = '';
-        console.log('arrAns = ' + arrAns);
         for(let i of arrAns) screen.textContent += i;
-        console.log('HERE');
         num1 = arrAns;
         mode = 2;
     }
