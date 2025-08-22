@@ -1,10 +1,12 @@
-let num1 = ['0'];
+let num1 = [];
 let op = "";
-let num2 = ['0'];
+let num2 = [];
 let mode = 0;
 let ans = [];
 let dec1 = 0;
 let dec2 = 0;
+let numDigits1 = 0;
+let numDigits2 = 0;
 let screen = document.querySelector('#display');
 screen.textContent = '';
 
@@ -24,65 +26,218 @@ function div(a, b) {
     return a / b;
 }
 
-function input(e) {
-    switch (e.target.id) {
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case '0':
-        case '.':
-            inputNum(e.target.id);
+function modeZero (input) {
+    switch (input) {
+        case ".":
+            if (!dec1 && numDigits1 < 6) {
+                num1.push(input);
+                screen.textContent += input;
+                dec1 = 1;
+            };
             break;
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-            op = e.target.id;
-            screen.textContent += '' + op + '';
-            mode = 1;
+        case "-":
+            if (num1.length === 0){
+                num1.push(input);
+                screen.textContent += input;
+            } else {
+                op = input;
+                screen.textContent += input;
+                mode = 1;
+            };
             break;
-        case '=':
+        case "+":
+        case "*":
+        case "/":
+            if (num1.length > 0) {
+                op = input;
+                screen.textContent += input;
+                mode = 1;
+            };
+            break;
+        case "0":
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+            if (num1[0] === '0' || (num1[0] === '-' && num1[1] === '0')) {
+                num1.pop();
+                screen.textContent = screen.textContent.slice(0,-1);
+                numDigits1--;
+            }
+            if (numDigits1 < 6) {
+                num1.push(input);
+                screen.textContent += input;
+                numDigits1++;
+            }
+            break;
+        case "clr":
+        case "Delete":
+            reset();
+            break;
+        case "bs":
+        case "Backspace":
+            let bs = num1.pop();
+            screen.textContent = screen.textContent.slice(0,-1);
+            if (bs !== '-' && bs !== '.') numDigits1--;
+            break;
+    }
+}
+
+function modeOne (input) {
+    console.log(input);
+    switch (input) {
+        case ".":
+            if (!dec2 && numDigits2 < 6) {
+                num2.push(input);
+                screen.textContent += input;
+                dec2 = 1;
+            };
+            break;
+        case "-":
+            if (num2.length === 0){
+                num2.push(input);
+                screen.textContent += input;
+            } else {
+                equal();
+                op = input;
+                screen.textContent += input;
+                mode = 1;
+                num2 = [];
+                dec2 = 0;
+                numDigits2 = 0;
+            };
+            break;
+        case "+":
+        case "*":
+        case "/":
+            if (num2.length > 0) {
+                equal();
+                op = input;
+                screen.textContent += input;
+                mode = 1;
+                num2 = [];
+                dec2 = 0;
+                numDigits2 = 0;
+            };
+            break;
+        case "0":
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+            if (num2[0] === '0' || (num2[0] === '-' && num2[1] === '0')) {
+                num2.pop();
+                screen.textContent = screen.textContent.slice(0,-1);
+                numDigits2--;
+            }
+            if (numDigits2 < 6) {
+                num2.push(input);
+                screen.textContent += input;
+                numDigits2++;
+            }
+            break;
+        case "=":
+        case "Enter":
             equal();
             break;
-        case 'clr':
+        case "clr":
+        case "Delete":
+            reset();
+            break;
+        case "bs":
+        case "Backspace":
+            let bs = num2.pop();
+            screen.textContent = screen.textContent.slice(0,-1);
+            if (bs !== '-' && bs !== '.') numDigits2--;
+            break;
+    }
+}
+
+function modeTwo (input) {
+    switch (input) {
+        case "+":
+        case "-":
+        case "*":
+        case "/":
+            mode = 1;
+            num2 = [];
+            dec2 = 0;
+            numDigits2 = 0;
+            op = input;
+            screen.textContent += input;
+            break;
+        case "0":
+        case "1":
+        case "2":
+        case "3":
+        case "4":
+        case "5":
+        case "6":
+        case "7":
+        case "8":
+        case "9":
+            mode =0;
+            reset();
+            modeZero(input);
+            break;
+        case "=":
+        case "Enter":
+            equal();
+            break;
+        case "clr":
+        case "Delete":
             reset();
             break;
     }
 }
 
-function inputChar (val) {
-    val = val.toString();
-    if (val === '.') {
+function input (e) {
+    switch (mode) {
+        case 0:
+            modeZero(e.target.id);
+            break;
+        case 1:
+            modeOne(e.target.id);
+            break;
+        case 2:
+            modeTwo(e.target.id);
+            break;
     }
 }
 
-function inputNum(val) {
-    val = val.toString();
-    if (mode === 0) {
-        if (num1[0] === '0') num1[0] = val;
-        else num1.push(val);
-        console.log('num1 = ' + num1);
+function keyInput (e) {
+    switch (mode) {
+        case 0:
+            modeZero(e.key);
+            break;
+        case 1:
+            modeOne(e.key);
+            break;
+        case 2:
+            modeTwo(e.key);
+            break;
     }
-    else {
-        if (num2[0] === '0') num2[0] = val;
-        else num2.push(val);
-        console.log('num2 = ' + num2);
-    }
-    screen.textContent += val;
 }
 
 function reset() {
-    console.log('clr');
-    num1 = ['0'];
-    num2 = ['0'];
+    num1 = [];
+    num2 = [];
     op = '';
     mode = 0;
+    dec1 = 0;
+    dec2 = 0;
+    numDigits1 = 0;
+    numDigits2 = 0;
     screen.textContent = '';
 }
 
@@ -101,11 +256,18 @@ function equal() {
         case '/':
             numAns = div(arr2Num(num1), arr2Num(num2));
     }
-    let arrAns = num2Arr(Math.round(numAns*100000)/100000);
-    screen.textContent = '';
-    for(let i of arrAns) screen.textContent += i;
-    num1 = arrAns;
-    mode = 2;
+    if (numAns > 999999) {
+        mode = 3;
+        screen.textContent = "OVERFLOW";
+    } else {
+        let arrAns = num2Arr(numAns);
+        screen.textContent = '';
+        console.log('arrAns = ' + arrAns);
+        for(let i of arrAns) screen.textContent += i;
+        console.log('HERE');
+        num1 = arrAns;
+        mode = 2;
+    }
 }
 
 function arr2Num(arr) {
@@ -123,14 +285,22 @@ function arr2Num(arr) {
         }
     }
     if (neg) sum *= -1;
-    console.log(sum);
     return sum;
 }
 
 function num2Arr(num) {
     let str = num.toString();
-    return str.split('');
+    str = str.split('');
+    let count = 0;
+    let digitCount = 0;
+    while (digitCount < 6 && count < str.length) {
+        if (str[count] !== '.' && str[count] !== '-') digitCount++;
+        count++;
+    }
+    str.length = count;
+    return str;
 }
 
 let react = document.querySelector('#buttons');
 react.addEventListener('click', input);
+document.addEventListener('keydown', keyInput);
